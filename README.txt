@@ -61,14 +61,25 @@ Then we can use it as normal
     >>> wrapped.do_stuff("yay")
     'yay stuff done: 5'
 
+
 Instances
 ---------
 
-The instances are all separate still, their instance data is stored remotely.
+The instances are separate still, their instance data is stored
+remotely.
 
     >>> wrapped_again = d.register(testclasses.ToWrap, 7)
     >>> wrapped_again.do_stuff("boo")
     'boo stuff done: 7'
+
+    >>> s.cls
+    {0: <dispy.ToWrap object at 0x...>, 1: <dispy.ToWrap object at 0x...>}
+
+    >>> s.cls[0].num
+    5
+
+    >>> s.cls[1].num
+    7
 
 
 Server finish
