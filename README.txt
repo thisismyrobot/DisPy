@@ -1,23 +1,25 @@
-dispy - distributed python
+DisPy - distributed python
 ==========================
 
-Totally general purpose distributed python computation.
+General-purpose distributed Python processing
 
 
 Introduction
 ------------
 
-Firstly, you run up one or more "server" instances. Then, general Python
-code can then be wrapped by some "magic sauce" that copies the code to a
-server (via xml-rpc), replacing the method calls with stubs that call
-the methods on the servers transparently.
+XML-RPC already allows for the calling of methods & access to members
+over HTTP, via XML. DisPy takes this concept a little further, allowing
+for class definitions to be pushed from client to server(s) at run-time
+(again, via XML- RPC), instances to be created on the server and for
+member & method access over the same XML-RPC connection.
+
+It is very very very alpha, I only guarantee what's tested below :)
 
 
-Ref
----
+Requirements
+------------
 
-http://docs.python.org/release/3.1.3/library/xmlrpc.server.html
-#simplexmlrpcserver-example
+It currently works on Python 3.2.2 on Ubuntu.
 
 
 Server
@@ -28,7 +30,7 @@ First, we need a server
     >>> import dispy
     >>> s = dispy.Server()
 
-And we start it via threading in the doctest
+And we start it, via threading, in the doctest
 
     >>> import threading
     >>> ts = threading.Thread(target=s.start)
@@ -66,5 +68,6 @@ Server finish
 And we need to stop the server
 
     >>> s.stop()
+
 
 
