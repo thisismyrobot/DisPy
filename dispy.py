@@ -9,6 +9,7 @@ class Server(object):
         self.server = xmlrpc.server.SimpleXMLRPCServer(("localhost", 8000))
         self.server.register_function(self._register, 'register')
         self.server.register_function(self._call, 'call')
+        self.server.register_function(self._get, 'get')
         self.cls = {}
 
     def start(self):
@@ -24,16 +25,19 @@ class Server(object):
         classes = dir()
         exec(cls_src)
         newclass = [c for c in dir() if c not in classes][0]
-
         next_id = len(self.cls)
         self.cls[next_id] = eval(newclass)(*args)
-
         return next_id
 
     def _call(self, cls_id, method, *args):
         """ Call a method, only to be called via xml-rpc
         """
         return getattr(self.cls[cls_id], method)(*args)
+
+    def _get(self, cls_id, attr):
+        """ Return the value of an attribute.
+        """
+        return getattr(self.cls[cls_id], attr)
 
 
 class DisPy(object):
@@ -49,11 +53,15 @@ class DisPy(object):
         # copy the rouce code to the server, instanciate with args
         instance_id = self.proxy.register(src, *args)
 
+        import pdb; pdb.set_trace()
+
         for member in inspect.getmembers(cls):
             if inspect.isfunction(member[1]):
                 if member[0] == '__init__':
                     setattr(cls, member[0], lambda x: None)
                 else:
                     setattr(cls, member[0], lambda x, *y: self.proxy.call(instance_id, member[0], *y))
+
+        setattr(cls, '__getattr__', lambda x, y: self.proxy.get(instance_id, y))
 
         return cls()

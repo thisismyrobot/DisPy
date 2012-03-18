@@ -40,6 +40,9 @@ Wrapping
     >>> wrapped.do_stuff("yay")
     'yay stuff done: 7'
 
+    >>> wrapped.num
+    7
+
 Server finish
 -------------
 
