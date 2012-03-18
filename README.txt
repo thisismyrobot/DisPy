@@ -43,6 +43,10 @@ Wrapping
     >>> wrapped.num
     7
 
+    >>> wrapped.num = 5
+    >>> wrapped.num
+    5
+
 Server finish
 -------------
 

@@ -10,6 +10,7 @@ class Server(object):
         self.server.register_function(self._register, 'register')
         self.server.register_function(self._call, 'call')
         self.server.register_function(self._get, 'get')
+        self.server.register_function(self._set, 'set')
         self.cls = {}
 
     def start(self):
@@ -39,6 +40,12 @@ class Server(object):
         """
         return getattr(self.cls[cls_id], attr)
 
+    def _set(self, cls_id, attr, val):
+        """ Return the value of an attribute.
+        """
+        setattr(self.cls[cls_id], attr, val)
+        return 0
+
 
 class DisPy(object):
 
@@ -53,8 +60,6 @@ class DisPy(object):
         # copy the rouce code to the server, instanciate with args
         instance_id = self.proxy.register(src, *args)
 
-        import pdb; pdb.set_trace()
-
         for member in inspect.getmembers(cls):
             if inspect.isfunction(member[1]):
                 if member[0] == '__init__':
@@ -63,5 +68,6 @@ class DisPy(object):
                     setattr(cls, member[0], lambda x, *y: self.proxy.call(instance_id, member[0], *y))
 
         setattr(cls, '__getattr__', lambda x, y: self.proxy.get(instance_id, y))
+        setattr(cls, '__setattr__', lambda x, y, z: self.proxy.set(instance_id, y, z))
 
         return cls()
