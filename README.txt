@@ -22,6 +22,12 @@ Requirements
 It currently works on Python 3.2.2 on Ubuntu.
 
 
+Limitations
+-----------
+
+ * No static members
+
+
 Server
 ------
 
@@ -44,7 +50,7 @@ We can wrap a class during the initialisation of it
 
     >>> import testclasses
     >>> d = dispy.DisPy()
-    >>> wrapped = d.register(testclasses.ToWrap, 7)
+    >>> wrapped = d.init(testclasses.ToWrap, 7)
 
 Then we can use it as normal
 
@@ -68,7 +74,7 @@ Instances
 The instances are separate still, their instance data is stored
 remotely.
 
-    >>> wrapped_again = d.register(testclasses.ToWrap, 7)
+    >>> wrapped_again = d.init(testclasses.ToWrap, 7)
     >>> wrapped_again.do_stuff("boo")
     'boo stuff done: 7'
 
@@ -98,14 +104,14 @@ This is how changing static members would normally work
     >>> st.num
     5
 
-This doesn't happen correctly with DisPy - changes to static members aren't
-copied out to the servers, but they are reflected locally. Long story short:
-don't use them.
+This doesn't happen correctly with DisPy - changes to static members
+aren't copied out to the servers, but they are reflected locally. Long
+story short: don't use them.
 
     >>> testclasses.Static.num
     13
 
-    >>> stat = d.register(testclasses.Static)
+    >>> stat = d.init(testclasses.Static)
     >>> stat.num
     13
 
@@ -115,6 +121,26 @@ don't use them.
 
     >>> s.cls[2].num
     13
+
+
+Decorators
+----------
+
+Decorators work fine
+
+    >>> dec = d.init(testclasses.Decorated)
+    >>> dec.a_num
+    42
+
+    >>> dec.val = 14
+    >>> dec.val
+    14
+
+    >>> dec.a_num
+    14
+
+    >>> s.cls[3].a_num
+    14
 
 
 Server finish

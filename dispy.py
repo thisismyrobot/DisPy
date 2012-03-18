@@ -7,7 +7,7 @@ class Server(object):
 
     def __init__(self):
         self.server = xmlrpc.server.SimpleXMLRPCServer(("localhost", 8000))
-        self.server.register_function(self._register, 'register')
+        self.server.register_function(self._init, 'init')
         self.server.register_function(self._call, 'call')
         self.server.register_function(self._get, 'get')
         self.server.register_function(self._set, 'set')
@@ -19,7 +19,7 @@ class Server(object):
     def stop(self):
         self.server.shutdown()
 
-    def _register(self, cls_src, *args):
+    def _init(self, cls_src, *args):
         """ Register some code - only to be called via xml-rpc, returns a
             class id.
         """
@@ -53,12 +53,12 @@ class DisPy(object):
         self.proxy = xmlrpc.client.ServerProxy('http://localhost:8000')
         self.id = None
 
-    def register(self, cls, *args):
+    def init(self, cls, *args):
         # get the source code of the class
         src = inspect.getsource(cls)
 
         # copy the source code to the server, instantiate with args
-        instance_id = self.proxy.register(src, *args)
+        instance_id = self.proxy.init(src, *args)
 
         for member in inspect.getmembers(cls):
             if inspect.isfunction(member[1]):

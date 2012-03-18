@@ -9,3 +9,13 @@ class ToWrap(object):
 
 class Static(object):
     num = 13
+
+
+class Decorated(object):
+
+    def __init__(self):
+        self.val = 42
+
+    @property
+    def a_num(self):
+        return self.val
