@@ -82,6 +82,41 @@ remotely.
     7
 
 
+Static members
+--------------
+
+This is how changing static members would normally work
+
+    >>> class Static(object):
+    ...     num = 12
+
+    >>> st = Static()
+    >>> st.num
+    12
+
+    >>> Static.num = 5
+    >>> st.num
+    5
+
+This doesn't happen correctly with DisPy - changes to static members aren't
+copied out to the servers, but they are reflected locally. Long story short:
+don't use them.
+
+    >>> testclasses.Static.num
+    13
+
+    >>> stat = d.register(testclasses.Static)
+    >>> stat.num
+    13
+
+    >>> testclasses.Static.num = 7
+    >>> stat.num
+    7
+
+    >>> s.cls[2].num
+    13
+
+
 Server finish
 -------------
 

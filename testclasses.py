@@ -5,3 +5,7 @@ class ToWrap(object):
 
     def do_stuff(self, word):
         return word + " stuff done: " + str(self.num)
+
+
+class Static(object):
+    num = 13

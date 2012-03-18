@@ -57,7 +57,7 @@ class DisPy(object):
         # get the source code of the class
         src = inspect.getsource(cls)
 
-        # copy the rouce code to the server, instanciate with args
+        # copy the source code to the server, instantiate with args
         instance_id = self.proxy.register(src, *args)
 
         for member in inspect.getmembers(cls):
