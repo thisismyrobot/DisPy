@@ -22,12 +22,12 @@ class ZeroconfClient(object):
         bus = dbus.SystemBus(mainloop=DBusGMainLoop())
         self.server = dbus.Interface(bus.get_object(avahi.DBUS_NAME, '/'),
                                      'org.freedesktop.Avahi.Server')
-        sbrowser = dbus.Interface(bus.get_object(avahi.DBUS_NAME,
-                                                 self.server.ServiceBrowserNew(avahi.IF_UNSPEC,
-                                                                               avahi.PROTO_INET,
-                                                                               "_http._tcp",
-                                                                               'local',
-                                                                               dbus.UInt32(0))),
+        sbn = self.server.ServiceBrowserNew(avahi.IF_UNSPEC,
+                                            avahi.PROTO_INET,
+                                            "_http._tcp",
+                                            'local',
+                                            dbus.UInt32(0))
+        sbrowser = dbus.Interface(bus.get_object(avahi.DBUS_NAME, sbn),
                                   avahi.DBUS_INTERFACE_SERVICE_BROWSER)
         sbrowser.connect_to_signal("ItemNew", self.myhandler)
         gobject.threads_init()
@@ -156,10 +156,14 @@ class DisPyWrapper(object):
 
         for member in inspect.getmembers(cls):
             if inspect.isfunction(member[1]):
-                setattr(cls, member[0], lambda x, *y: self.proxy.call(instance_id, member[0], *y))
+                setattr(cls, member[0],
+                        lambda x, *y: self.proxy.call(instance_id,
+                                                      member[0], *y))
 
         setattr(cls, '__init__', lambda x: None)
-        setattr(cls, '__getattr__', lambda x, y: self.proxy.get(instance_id, y))
-        setattr(cls, '__setattr__', lambda x, y, z: self.proxy.set(instance_id, y, z))
+        setattr(cls, '__getattr__',
+                lambda x, y: self.proxy.get(instance_id, y))
+        setattr(cls, '__setattr__',
+                lambda x, y, z: self.proxy.set(instance_id, y, z))
 
         return cls()
