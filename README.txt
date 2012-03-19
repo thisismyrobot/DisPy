@@ -19,7 +19,9 @@ It is very very very alpha, I only guarantee what's tested below :)
 Requirements
 ------------
 
-It currently works on Python 3.2.2 on Ubuntu.
+It currently works on Python 2.7 on Ubuntu.
+
+Requires python-avahi package.
 
 
 Limitations
