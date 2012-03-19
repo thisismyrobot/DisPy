@@ -43,15 +43,25 @@ And we start it, via threading, in the doctest
     >>> import threading
     >>> ts = threading.Thread(target=s.start)
     >>> ts.start()
+    >>> import time; time.sleep(0.5)
 
+
+Connecting
+----------
+
+We can connect to servers without much hassle due to the power of Avahi. While
+starting the server above we have published it's details. The client can grab
+these details without any setup
+
+    >>> g = dispy.DisPyWrapper()
 
 Wrapping
 --------
 
-We can wrap a class during the initialisation of it
+We can wrap a class during the initialisation of it.
 
     >>> import testclasses
-    >>> d = dispy.DisPy()
+    >>> d = dispy.DisPyWrapper()
     >>> wrapped = d.init(testclasses.ToWrap, 7)
 
 Then we can use it as normal

@@ -1,15 +1,62 @@
 import avahi
 import dbus
+import gobject
 import inspect
+import threading
 import xmlrpclib
+
+from dbus.mainloop.glib import DBusGMainLoop
 from SimpleXMLRPCServer import SimpleXMLRPCServer
 
 
 ZC_NAME = 'DisPyNode'
+PORT = 8000
 
 
-class ZeroconfService:
-    """ Avahi zeroconf for server discovery
+class ZeroconfClient(object):
+    """ Avahi zeroconf service searcher
+    """
+
+    def __init__(self):
+        self.srv = None
+        bus = dbus.SystemBus(mainloop=DBusGMainLoop())
+        self.server = dbus.Interface(bus.get_object(avahi.DBUS_NAME, '/'),
+                                     'org.freedesktop.Avahi.Server')
+        sbrowser = dbus.Interface(bus.get_object(avahi.DBUS_NAME,
+                                                 self.server.ServiceBrowserNew(avahi.IF_UNSPEC,
+                                                                               avahi.PROTO_INET,
+                                                                               "_http._tcp",
+                                                                               'local',
+                                                                               dbus.UInt32(0))),
+                                  avahi.DBUS_INTERFACE_SERVICE_BROWSER)
+        sbrowser.connect_to_signal("ItemNew", self.myhandler)
+        gobject.threads_init()
+        loop = gobject.MainLoop()
+        self.context = loop.get_context()
+        threading.Thread(target=self.wait).run()
+
+    def wait(self):
+        while self.srv is None:
+            self.context.iteration(True)
+
+    def service_resolved(self, *args):
+        name, addr, port = str(args[2]), str(args[7]), int(args[8])
+        if name == ZC_NAME:
+            self.srv = (addr, port)
+            return
+
+    def print_error(self, *args):
+        pass
+
+    def myhandler(self, interface, protocol, name, stype, domain, flags):
+        self.server.ResolveService(interface, protocol, name, stype, domain,
+                                   avahi.PROTO_INET, dbus.UInt32(0),
+                                   reply_handler=self.service_resolved,
+                                   error_handler=self.print_error)
+
+
+class ZeroconfService(object):
+    """ Avahi zeroconf service advertiser
     """
 
     def __init__(self, name, port, stype="_http._tcp", domain="", host="",
@@ -44,9 +91,8 @@ class ZeroconfService:
 
 class Server(object):
 
-    def __init__(self, port=8000):
-        self.port = port
-        self.server = SimpleXMLRPCServer(("localhost", port))
+    def __init__(self):
+        self.server = SimpleXMLRPCServer(("localhost", PORT))
         self.server.register_function(self._init, 'init')
         self.server.register_function(self._call, 'call')
         self.server.register_function(self._get, 'get')
@@ -54,7 +100,7 @@ class Server(object):
         self.cls = {}
 
     def start(self):
-        self.service = ZeroconfService(name=ZC_NAME, port=self.port)
+        self.service = ZeroconfService(name=ZC_NAME, port=PORT)
         self.service.publish()
         self.server.serve_forever()
 
@@ -90,11 +136,15 @@ class Server(object):
         return 0
 
 
-class DisPy(object):
+class DisPyWrapper(object):
 
-    def __init__(self):
-        
-        self.proxy = xmlrpclib.ServerProxy('http://localhost:8000')
+    def __init__(self, address=None):
+        if address is None:
+            zcc = ZeroconfClient()
+            addr, port = zcc.srv
+            address = 'http://' + addr + ':' + str(port)
+
+        self.proxy = xmlrpclib.ServerProxy(address)
         self.id = None
 
     def init(self, cls, *args):
