@@ -21,8 +21,6 @@ Requirements
 
 It currently works on Python 2.7 on Ubuntu.
 
-Requires python-avahi package.
-
 
 Limitations
 -----------
@@ -43,17 +41,7 @@ And we start it, via threading, in the doctest
     >>> import threading
     >>> ts = threading.Thread(target=s.start)
     >>> ts.start()
-    >>> import time; time.sleep(0.5)
 
-
-Connecting
-----------
-
-We can connect to servers without much hassle due to the power of Avahi. While
-starting the server above we have published it's details. The client can grab
-these details without any setup
-
-    >>> g = dispy.DisPyWrapper()
 
 Wrapping
 --------
@@ -61,8 +49,8 @@ Wrapping
 We can wrap a class during the initialisation of it.
 
     >>> import testclasses
-    >>> d = dispy.DisPyWrapper()
-    >>> wrapped = d.init(testclasses.ToWrap, 7)
+    >>> d = dispy.WrapperTool('127.0.0.1')
+    >>> wrapped = d.init_cls(testclasses.ToWrap, 7)
 
 Then we can use it as normal
 
@@ -86,7 +74,7 @@ Instances
 The instances are separate still, their instance data is stored
 remotely.
 
-    >>> wrapped_again = d.init(testclasses.ToWrap, 7)
+    >>> wrapped_again = d.init_cls(testclasses.ToWrap, 7)
     >>> wrapped_again.do_stuff("boo")
     'boo stuff done: 7'
 
@@ -123,7 +111,7 @@ story short: don't use them.
     >>> testclasses.Static.num
     13
 
-    >>> stat = d.init(testclasses.Static)
+    >>> stat = d.init_cls(testclasses.Static)
     >>> stat.num
     13
 
@@ -140,7 +128,7 @@ Decorators
 
 Decorators work fine
 
-    >>> dec = d.init(testclasses.Decorated)
+    >>> dec = d.init_cls(testclasses.Decorated)
     >>> dec.a_num
     42
 
