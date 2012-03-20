@@ -19,7 +19,7 @@ It is very very very alpha, I only guarantee what's tested below :)
 Requirements
 ------------
 
-It currently works on Python 2.7 on Ubuntu.
+Tested on Python 2.7 on Ubuntu 11.10.
 
 
 Limitations

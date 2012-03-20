@@ -8,6 +8,8 @@ PORT = 8000
 
 
 class Server(object):
+    """ A general purpose XML-RPC-exposing server.
+    """
 
     def __init__(self, listen_ip='0.0.0.0'):
         """ Prepare the XML-RPC server, map the exposed functions.
