@@ -53,11 +53,11 @@ class Server(object):
         """ Register and initialise a class, class id. Only to be called via
             XML-RPC.
         """
-        classes = dir()
+        existing_classes = dir()
         exec(cls_src)
-        newclass = [c for c in dir() if c not in classes][0]
+        new_class = [c for c in dir() if c not in existing_classes][0]
         next_id = len(self.cls)
-        self.cls[next_id] = eval(newclass)(*args)
+        self.cls[next_id] = eval(new_class)(*args)
         return next_id
 
     def _call(self, cls_id, method, *args):
