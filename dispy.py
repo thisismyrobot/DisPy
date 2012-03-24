@@ -32,7 +32,7 @@ class Server(object):
     def __init__(self, listen_ip='0.0.0.0'):
         """ Prepare the XML-RPC server, map the exposed functions.
         """
-        self.server = SimpleXMLRPCServer((listen_ip, PORT))
+        self.server = SimpleXMLRPCServer((listen_ip, PORT), logRequests=False)
         self.server.register_function(self._init, 'init')
         self.server.register_function(self._call, 'call')
         self.server.register_function(self._get, 'get')
@@ -94,7 +94,10 @@ class WrapperTool(object):
         return inspect.getsource(cls)
 
     def _map_methods(self, cls, instance_id):
-        """ Map the methods to XML-RPC calls.
+        """ Map the methods to XML-RPC calls. Why not use the server module's
+            register_instance() method you ask? Well, it doesn't expose
+            members, only methods, and adding member access again is nearly
+            impossible....
         """
         for name, member in inspect.getmembers(cls):
             if inspect.isfunction(member):

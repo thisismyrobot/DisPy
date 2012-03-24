@@ -48,9 +48,9 @@ Wrapping
 
 We can wrap a class during the initialisation of it.
 
-    >>> import testclasses
+    >>> import testdata.testclasses
     >>> d = dispy.WrapperTool('127.0.0.1')
-    >>> wrapped = d.init_cls(testclasses.ToWrap, 7)
+    >>> wrapped = d.init_cls(testdata.testclasses.ToWrap, 7)
 
 Then we can use it as normal
 
@@ -74,7 +74,7 @@ Instances
 The instances are separate still, their instance data is stored
 remotely.
 
-    >>> wrapped_again = d.init_cls(testclasses.ToWrap, 7)
+    >>> wrapped_again = d.init_cls(testdata.testclasses.ToWrap, 7)
     >>> wrapped_again.do_stuff("boo")
     'boo stuff done: 7'
 
@@ -108,14 +108,14 @@ This doesn't happen correctly with DisPy - changes to static members
 aren't copied out to the servers, but they are reflected locally. Long
 story short: don't use them.
 
-    >>> testclasses.Static.num
+    >>> testdata.testclasses.Static.num
     13
 
-    >>> stat = d.init_cls(testclasses.Static)
+    >>> stat = d.init_cls(testdata.testclasses.Static)
     >>> stat.num
     13
 
-    >>> testclasses.Static.num = 7
+    >>> testdata.testclasses.Static.num = 7
     >>> stat.num
     7
 
@@ -128,7 +128,7 @@ Decorators
 
 Decorators work fine
 
-    >>> dec = d.init_cls(testclasses.Decorated)
+    >>> dec = d.init_cls(testdata.testclasses.Decorated)
     >>> dec.a_num
     42
 
